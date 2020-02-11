@@ -15,12 +15,15 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +97,7 @@ public class InactiveUserJobConfig {
     // destroyMethod = ""로 설정해 기능을 사용하지 않도록 설정한다.
     @Bean(destroyMethod = "")
     @StepScope
-    public JpaPagingItemReader<User> inactiveUserJpaReader(){
+    public JpaPagingItemReader<User> inactiveUserJpaReader(@Value("#{jobParameters[nowDate]}") Date nowDate){
         JpaPagingItemReader<User> jpaPagingItemReader = new JpaPagingItemReader(){
             @Override
             public int getPage() {
@@ -106,7 +109,7 @@ public class InactiveUserJobConfig {
 
         Map<String, Object> map = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
-        map.put("updatedDate", now);
+        map.put("updatedDate", LocalDateTime.ofInstant(nowDate.toInstant(), ZoneId.systemDefault()));
         map.put("status",UserStatus.ACTIVE);
 
         // 쿼리에서 사용된 updateDate, status 파라미터를 map에 추가해 사용할 파라미터를 설정한다.
