@@ -1,24 +1,23 @@
 package com.example.web.comunityweb;
 
 import com.example.web.comunityweb.domain.Board;
+import com.example.web.comunityweb.domain.Product;
 import com.example.web.comunityweb.domain.User;
 import com.example.web.comunityweb.domain.enums.BoardType;
 import com.example.web.comunityweb.domain.enums.UserStatus;
 import com.example.web.comunityweb.repository.BoardRepository;
 import com.example.web.comunityweb.repository.UserRepository;
-import com.sun.tools.javah.Gen;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
+import com.example.web.comunityweb.service.BoardService;
+import com.example.web.comunityweb.service.ProductService;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Arrays;
-import java.util.*;
 import java.util.stream.IntStream;
 
 @SpringBootApplication
@@ -31,7 +30,7 @@ public class ComunityWebApplication {
 
     @Bean
     // CommandLineRunner를 빈을 등록 후 repository를 주입받는다.
-    public CommandLineRunner runner(UserRepository userRepository, BoardRepository boardRepository) throws Exception{
+    public CommandLineRunner runner(UserRepository userRepository, BoardRepository boardRepository, ProductService productService) throws Exception{
         return (args -> {
             // user 객체를 Builder Pattern으로 생성한 후 주입받은 userRepository를 사용해 객체를 저장
            User user = userRepository.save(User.builder()
@@ -64,6 +63,12 @@ public class ComunityWebApplication {
                             .user(user)
                             .build()
                     ));
+//            System.out.println("insert 1");
+            productService.addProduct(Product.builder().name("1번").price(1000).build());
+//            System.out.println("insert 2");
+            productService.addProduct(Product.builder().name("2번").price(2000).build());
+//            System.out.println("find 1");
+            productService.findByProductName("1번");
         });
     }
 
